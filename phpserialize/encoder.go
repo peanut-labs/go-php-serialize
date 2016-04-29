@@ -54,6 +54,36 @@ func encodeValue(buf *bytes.Buffer, value interface{}) (err error) {
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		encodeString(buf, t)
 		buf.WriteRune(VALUES_SEPARATOR)
+	case map[int][]int:
+		buf.WriteString("a")
+		buf.WriteRune(TYPE_VALUE_SEPARATOR)
+		valLen := strconv.Itoa(len(t))
+		buf.WriteString(valLen)
+		buf.WriteRune(TYPE_VALUE_SEPARATOR)
+		buf.WriteRune('{')
+		for kk, vv := range t {
+			buf.WriteString("i")
+			buf.WriteRune(TYPE_VALUE_SEPARATOR)
+			buf.WriteString(strconv.Itoa(kk))
+			buf.WriteRune(VALUES_SEPARATOR)
+
+			buf.WriteString("a")
+			buf.WriteRune(TYPE_VALUE_SEPARATOR)
+			buf.WriteString(strconv.Itoa(len(vv)))
+			buf.WriteRune(TYPE_VALUE_SEPARATOR)
+
+			buf.WriteRune('{')
+			for k, v := range vv {
+				if err = encodeValue(buf, k); err != nil {
+					break
+				}
+				if err = encodeValue(buf, v); err != nil {
+					break
+				}
+			}
+			buf.WriteRune('}')
+		}
+		buf.WriteRune('}')
 	case map[interface{}]interface{}:
 		buf.WriteString("a")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
